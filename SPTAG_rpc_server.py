@@ -1,8 +1,10 @@
-from xmlrpc.server import SimpleXMLRPCServer
 import numpy as np
 import SPTAG
 import os
 import shutil
+import rpyc
+import json
+from rpyc.utils.server import ThreadedServer
 
 
 DATA_DIR = "data"
@@ -11,62 +13,67 @@ if not os.path.exists(DATA_DIR):
     os.mkdir(DATA_DIR)
 
 
-def add_data(index_name, p_data, p_meta, algo="BKT", dist="L2"):
-    index_name = os.path.join(DATA_DIR, index_name)
-    if os.path.exists(index_name):
-        i = SPTAG.AnnIndex.Load(index_name)
-    else:
-        i = SPTAG.AnnIndex(algo, 'Float', p_data.shape[1])
-    i.SetBuildParam("NumberOfThreads", '4')
-    i.SetBuildParam("DistCalcMethod", dist)
-    p_num = p_data.shape[0]
-    success = i.AddWithMetaData(p_data, p_meta, p_num)
-    if success:
-        i.Save(index_name)
-    return success
-
-
-def delete_data(index_name, p_data):
-    index_name = os.path.join(DATA_DIR, index_name)
-    i = SPTAG.AnnIndex.Load(index_name)
-    ret = i.Delete(p_data, p_data.shape[0])
-    i.Save(index_name)
-    return ret
-
-
-def search(index_name, p_data, p_resultNum):
-    index_name = os.path.join(DATA_DIR, index_name)
-    j = SPTAG.AnnIndex.Load(index_name)
-    j.SetSearchParam("MaxCheck", '1024')
-    returns = []
-    for t in range(p_data.shape[0]):
-        result = j.SearchWithMetaData(p_data[t], p_resultNum)
-        res = []
-        for i, _id in enumerate(result[2]):
-            res.append({
-                result[2][i].decode().strip(): result[1][i]
-            })
-        returns.append(res)
-    return returns
-
-
-def delete_index(index_name):
-    try:
+class SPTAG_Service(rpyc.Service):
+    def exposed_add_data(self, index_name, p_data, p_meta, algo="BKT", dist="L2"):
+        print("*"*100)
+        print("add_data")
+        p_data = np.array(p_data, dtype=np.float32)
         index_name = os.path.join(DATA_DIR, index_name)
-        shutil.rmtree(index_name)
-        return True
-    except:
-        return False
+        if os.path.exists(index_name):
+            i = SPTAG.AnnIndex.Load(index_name)
+        else:
+            i = SPTAG.AnnIndex(algo, 'Float', p_data.shape[1])
+        i.SetBuildParam("NumberOfThreads", '4')
+        i.SetBuildParam("DistCalcMethod", dist)
+        p_num = p_data.shape[0]
+        success = i.AddWithMetaData(p_data, p_meta, p_num)
+        if success:
+            i.Save(index_name)
+        return json.dumps(success)
+
+    def exposed_delete_data(self, index_name, p_data):
+        print("*"*100)
+        print("delete_data")
+        p_data = np.array(p_data, dtype=np.float32)
+        index_name = os.path.join(DATA_DIR, index_name)
+        i = SPTAG.AnnIndex.Load(index_name)
+        ret = i.Delete(p_data, p_data.shape[0])
+        i.Save(index_name)
+        return ret
+
+    def exposed_search(self, index_name, p_data, p_resultNum):
+        print("*"*100)
+        print("search")
+        p_data = np.array(p_data, dtype=np.float32)
+        index_name = os.path.join(DATA_DIR, index_name)
+        j = SPTAG.AnnIndex.Load(index_name)
+        j.SetSearchParam("MaxCheck", '1024')
+        returns = []
+        for t in range(p_data.shape[0]):
+            result = j.SearchWithMetaData(p_data[t], p_resultNum)
+            res = []
+            for i, _id in enumerate(result[2]):
+                res.append({
+                    result[2][i].decode().strip(): result[1][i]
+                })
+            returns.append(res)
+        return returns
+
+    def exposed_delete_index(self, index_name):
+        print("*"*100)
+        print("delete_index")
+        try:
+            index_name = os.path.join(DATA_DIR, index_name)
+            shutil.rmtree(index_name)
+            return True
+        except:
+            return False
 
 
 if __name__ == '__main__':
-    server = SimpleXMLRPCServer(('127.0.0.1', 8888))
-    server.register_function(add_data, "add_data")
-    server.register_function(delete_data, "delete_data")
-    server.register_function(search, "search")
-    server.register_function(delete_index, "delete_index")
-    print("Listening for Client")
-    server.serve_forever()
+    print("SPTAG_Service Serve on", 8888)
+    t = ThreadedServer(SPTAG_Service, port=8888)
+    t.start()
 
 
 # def test_api():
