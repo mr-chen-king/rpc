@@ -18,27 +18,29 @@ from SPTAG_rpc_client import SPTAG_RpcClient, DataBean
 
 
 if __name__ == "__main__":
-    client = SPTAG_RpcClient("127.0.0.1", "8888")
-    beans = []
-    for i in range(5):
-        vec = i * np.ones((10,), dtype=np.float32)
-        beans.append(DataBean(_id=f"s{i}", vec=vec))
-    
-    index_name = "test"
-    print("Adding Data:", client.add_data(index_name, beans))
-    
-    print("*"*100)
-    print("Test Search")
-    q = DataBean(_id=f"s{0}", vec=0 * np.ones((10,), dtype=np.float32))
-    
-    print("*"*100)
-    print("Test Delete:", client.delete_data(index_name, [q]))
-    
-    print("*"*100)
-    print("Test Search After Deletion")
-    print(client.search(index_name, [q], 3))
-    
-    print("*"*100)
-    print("Test Delete Index:", client.delete_index(index_name))
+
+client = SPTAG_RpcClient("127.0.0.1", "8888")
+beans = []
+for i in range(5):
+    vec = i * np.ones((10,), dtype=np.float32)
+    beans.append(DataBean(_id=f"s{i}", vec=vec))
+
+index_name = "test"
+print("Adding Data:", client.add_data(index_name, beans))
+
+print("*"*100)
+print("Test Search")
+q = DataBean(_id=f"s{0}", vec=0 * np.ones((10,), dtype=np.float32))
+print(client.search(index_name, [q], 3))
+
+print("*"*100)
+print("Test Delete:", client.delete_data(index_name, [q]))
+
+print("*"*100)
+print("Test Search After Deletion")
+print(client.search(index_name, [q], 3))
+
+print("*"*100)
+print("Test Delete Index:", client.delete_index(index_name))
 
 ```
