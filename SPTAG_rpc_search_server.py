@@ -63,6 +63,6 @@ SPTAG_index.SetSearchParam("MaxCheck", '1024')
 
 
 print("SPTAG_Search_Service Serve on", 8888)
-t = ThreadedServer(SPTAG_RpcDemoService, port=8888)
+t = ThreadedServer(SPTAG_RpcDemoService, port=8888, protocol_config={'allow_public_attrs': True})
 t.start()
 
