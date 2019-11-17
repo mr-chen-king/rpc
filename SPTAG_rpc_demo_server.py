@@ -3,7 +3,6 @@ import SPTAG
 import os
 import shutil
 import rpyc
-import json
 from rpyc.utils.server import ThreadedServer
 
 
@@ -13,7 +12,7 @@ if not os.path.exists(DATA_DIR):
     os.mkdir(DATA_DIR)
 
 
-class SPTAG_Service(rpyc.Service):
+class SPTAG_RpcDemoService(rpyc.Service):
     def exposed_add_data(self, index_name, p_data, p_meta, algo="BKT", dist="L2"):
         print("*"*100)
         print("add_data")
@@ -29,7 +28,7 @@ class SPTAG_Service(rpyc.Service):
         success = i.AddWithMetaData(p_data, p_meta, p_num)
         if success:
             i.Save(index_name)
-        return json.dumps(success)
+        return success
 
     def exposed_delete_data(self, index_name, p_data):
         print("*"*100)
@@ -71,8 +70,8 @@ class SPTAG_Service(rpyc.Service):
 
 
 if __name__ == '__main__':
-    print("SPTAG_Service Serve on", 8888)
-    t = ThreadedServer(SPTAG_Service, port=8888)
+    print("SPTAG_Demo_Service Serve on", 8888)
+    t = ThreadedServer(SPTAG_RpcDemoService, port=8888)
     t.start()
 
 
