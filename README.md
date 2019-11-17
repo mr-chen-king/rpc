@@ -53,7 +53,7 @@ python3 export_test_index_input.py
 
 ### copy test_index_input.txt into docker
 ```bash
-docker cp mm_index_input.txt 25042d741f07:/app/Release/
+docker cp test_index_input.txt 25042d741f07:/app/Release/
 ```
 
 ### enter in SPTAG-docker, create index by indexbuilder
