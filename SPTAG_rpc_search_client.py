@@ -24,8 +24,9 @@ class SPTAG_RpcSearchClient:
     DIST_L2 = "L2"
     DIST_Cosine = "Cosine"
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, timeout=240):
         c = rpyc.connect(host, port)
+        c._config['sync_request_timeout'] = timeout
         self.proxy = c.root
 
     def search(self, beans: [DataBean], p_resultNum):

@@ -18,7 +18,7 @@ from SPTAG_rpc_demo_client import SPTAG_RpcDemoClient, DataBean
 
 
 if __name__ == "__main__":
-    client = SPTAG_RpcDemoClient("127.0.0.1", "8888")
+    client = SPTAG_RpcDemoClient("127.0.0.1", "8888", timeout=None)
     beans = []
     for i in range(5):
         vec = i * np.ones((10,), dtype=np.float32)
@@ -74,7 +74,7 @@ from SPTAG_rpc_search_client import SPTAG_RpcSearchClient, DataBean
 
 
 if __name__ == "__main__":
-    client = SPTAG_RpcSearchClient("127.0.0.1", "8888")
+    client = SPTAG_RpcSearchClient("127.0.0.1", "8888", timeout=None)
     print("Test Search")
     q = DataBean(_id=f"s{0}", vec=0 * np.ones((10,), dtype=np.float32))
     print(client.search([q], 3))
