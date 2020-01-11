@@ -70,8 +70,8 @@ class SPTAG_RpcDemoService(rpyc.Service):
 
 
 if __name__ == '__main__':
-    print("SPTAG_Demo_Service Serve on", 8000)
-    t = ThreadedServer(SPTAG_RpcDemoService, port=8000, protocol_config={'allow_public_attrs': True})
+    print("SPTAG_Demo_Service Serve on", 8888)
+    t = ThreadedServer(SPTAG_RpcDemoService, port=8888, protocol_config={'allow_public_attrs': True})
     t.start()
 
 # def test_api():
