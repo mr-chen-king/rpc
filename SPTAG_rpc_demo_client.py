@@ -67,7 +67,7 @@ class SPTAG_RpcDemoClient:
 
 
 if __name__ == '__main__':
-    client = SPTAG_RpcDemoClient("127.0.0.1", "8888")
+    client = SPTAG_RpcDemoClient("127.0.0.1", "8000")
     beans = []
     for i in range(5):
         vec = i * np.ones((10,), dtype=np.float32)
